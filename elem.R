@@ -70,7 +70,7 @@ y <- automobile$log_price
 X <- automobile; X$log_price <- NULL
 
 bart_machine <- bartMachine(X,y)
-raw_data <- extract_raw_node_data(bart_machine)
+raw_data <- extract_raw_node_data(bart_machine, g= 250)
 
 texts = serialize_all_trees(raw_data)
 write.table(texts, "mydata.txt", quote=FALSE, sep="", col.names = FALSE, row.names = FALSE)
