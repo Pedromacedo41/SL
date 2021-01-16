@@ -55,9 +55,23 @@ def get_crime():
     save_to_csv('crime', X, y)
 
 
+def get_forest_fires():
+    url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/forest-fires/forestfires.csv'
+
+    df = pd.read_csv(url)
+    df = df.drop(columns=['month', 'day'])
+
+    X = df.to_numpy()
+    y = X[:, -1]
+    X = X[:, :-1]
+
+    save_to_csv('forestfires', X, y)
+
+
 if __name__ == "__main__":
     os.makedirs('data/', exist_ok=True)
 
     get_auto_mpg()
     get_housing()
     get_crime()
+    get_forest_fires()
