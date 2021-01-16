@@ -68,6 +68,22 @@ def get_forest_fires():
     save_to_csv('forestfires', X, y)
 
 
+def get_wisconsin():
+    url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wpbc.data'
+
+    df = pd.read_csv(url, header=None, na_values='?')
+    df = df.dropna(axis=1)
+    df = df.drop(columns=[0])
+    df[1] = (df[1] == 'R').astype('float32')
+
+    X = df.to_numpy()
+    X[:, [0, 1]] = X[:, [1, 0]]
+    y = X[:, 0]
+    X = X[:, 1:]
+
+    save_to_csv('wisconsin', X, y)
+
+
 if __name__ == "__main__":
     os.makedirs('data/', exist_ok=True)
 
@@ -75,3 +91,4 @@ if __name__ == "__main__":
     get_housing()
     get_crime()
     get_forest_fires()
+    get_wisconsin()
