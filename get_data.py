@@ -42,8 +42,22 @@ def get_housing():
     save_to_csv('housing', X, y)
 
 
+def get_crime():
+    url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/communities/communities.data'
+
+    df = pd.read_csv(url, header=None, na_values='?').drop(columns=[3]) # drop string column
+    df = df.dropna(axis=1)
+
+    X = df.to_numpy()
+    y = X[:, -1]
+    X = X[:, :-1]
+
+    save_to_csv('crime', X, y)
+
+
 if __name__ == "__main__":
     os.makedirs('data/', exist_ok=True)
 
     get_auto_mpg()
     get_housing()
+    get_crime()
