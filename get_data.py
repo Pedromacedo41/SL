@@ -84,6 +84,18 @@ def get_wisconsin():
     save_to_csv('wisconsin', X, y)
 
 
+def get_concrete():
+    url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/concrete/compressive/Concrete_Data.xls'
+
+    df = pd.read_excel(url)
+
+    X = df.to_numpy()
+    y = X[:, -1]
+    X = X[:, :-1]
+
+    save_to_csv('concrete', X, y)
+
+
 if __name__ == "__main__":
     os.makedirs('data/', exist_ok=True)
 
@@ -92,3 +104,4 @@ if __name__ == "__main__":
     get_crime()
     get_forest_fires()
     get_wisconsin()
+    get_concrete()
