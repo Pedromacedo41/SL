@@ -1,5 +1,7 @@
 # VSCode settings
 .vscode
 
-# data directory
+# data, logs and model checkpoints
 data/
+logs/
+models/
