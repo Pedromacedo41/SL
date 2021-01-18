@@ -1,0 +1,1 @@
+install.packages("bartMachine", repo="https://pbil.univ-lyon1.fr/CRAN/")
