@@ -98,7 +98,7 @@ set_bart_machine_num_cores(6)
 bart_machine <- bartMachine(X_train, y_train,
     num_trees=30,
     num_burn_in=100,
-    num_iterations_after_burn_in = 1000
+    num_iterations_after_burn_in=1000,
 )
 
 # Compute validation and test RMSE
@@ -110,10 +110,10 @@ print(paste("Validation RMSE:", val_rmse))
 print(paste("Test RMSE:", test_rmse))
 
 # Export raw data
-raw_data <- extract_raw_node_data(bart_machine, g=250)
+raw_data <- extract_raw_node_data(bart_machine, g=1000)
 texts <- serialize_all_trees(raw_data)
 write.table(texts, paste("models/bart_", args[1], args[2], ".model", sep=""),
-    quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
+  quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
 
 # Record train/validation/test scores
 scores <- data.frame(train_rmse, val_rmse, test_rmse)

@@ -1,6 +1,9 @@
+from glob import glob
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.modules.linear import Linear
 
 
 class TreeNode(object):
@@ -25,22 +28,29 @@ class TreeNode(object):
         self.posterior_mean = posterior_mean
 
 
+class LinearNoReset(nn.Linear):
+    def __init__(self, in_features, out_features, bias=True):
+        super(LinearNoReset, self).__init__(in_features, out_features, bias=bias)
+
+    def reset_parameters(self):
+        pass
+
 class NBART(nn.Module):
     """Neural Network derived from a single BART tree."""
-    def __init__(self, input_dim, inner_decisions, paths, gamma1=1.0, gamma2=1.0):
+    def __init__(self, input_dim, inner_decisions, paths, gamma1=100.0, gamma2=1.0):
         super(NBART, self).__init__()
         self.gamma1 = gamma1
         self.gamma2 = gamma2
 
         self.dic = {}
-        self.lin1 = nn.Linear(input_dim, len(inner_decisions))
+        self.lin1 = LinearNoReset(input_dim, len(inner_decisions))
         self.set_connections_1_layer(inner_decisions)
 
-        self.lin2 = nn.Linear(len(inner_decisions), 1 + len(inner_decisions))
+        self.lin2 = LinearNoReset(len(inner_decisions), 1 + len(inner_decisions))
         self.avgs = []
         self.set_connections_2_layer(paths)
 
-        self.lin3 = nn.Linear(1 + len(inner_decisions), 1)
+        self.lin3 = LinearNoReset(1 + len(inner_decisions), 1)
         self.set_connections_3_layer()
 
     def forward(self, x):
@@ -124,12 +134,27 @@ def load_trees(filename):
     return trees
 
 
-def to_nbart(trees, input_dim):
+def load_bart(model_name):
+    filenames = glob("models/{}/*.model".format(model_name))
+    bart = []
+    for filename in filenames:
+        bart.append(load_trees(filename))
+    return bart
+
+
+def trees_to_nbart(trees, input_dim):
     nns = []
     for tree in trees:
         decisions, paths, _ =  inner_decisions(tree, [], 0)
         nns.append(NBART(input_dim, decisions, paths))
     return nns
+
+
+def bart_to_nbart(bart, input_dim):
+    nbart = []
+    for trees in bart:
+        nbart.append(trees_to_nbart(trees, input_dim))
+    return nbart
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from math import sqrt
+import pickle
 import os
 import shutil
 
@@ -11,7 +12,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import tqdm
 
-from nbart import load_trees, to_nbart
+from nbart import load_trees, trees_to_nbart
 
 
 def load_data(name):
@@ -40,9 +41,9 @@ def load_data(name):
     return train, val, test
 
 
-def predict(nbart, x):
-    out = nbart[0](x)
-    for m in nbart[1:]:
+def predict(nns, x):
+    out = nns[0](x)
+    for m in nns[1:]:
         out += m(x)
     return out
 
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     parser.add_argument('name', type=str)
     parser.add_argument('run', type=str)
     parser.add_argument('--epochs', '-e', type=int, default=100)
-    parser.add_argument('--learning-rate', '-lr', type=float, default=1e-3)
+    parser.add_argument('--learning-rate', '-lr', type=float, default=1e-2)
     parser.add_argument('--batch_size', '-b', type=int, default=32)
     args = parser.parse_args()
 
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     # Get model, optimizer and loss function
     input_dim = train[0][0].shape[0]
     trees = load_trees('models/bart_{}{}.model'.format(args.name, args.run))
-    nbart = to_nbart(trees, input_dim)
+    nbart = trees_to_nbart(trees, input_dim)
 
     params = []
     for m in nbart:
@@ -142,4 +143,6 @@ if __name__ == "__main__":
                   "  test rmse: {}\n".format(
                       epoch, train_rmse, val_rmse, test_rmse))
 
+    with open('logs/{}/metrics.pkl'.format(model_name), 'wb') as f:
+        pickle.dump(metrics, f)
     writer.close()
