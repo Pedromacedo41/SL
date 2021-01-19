@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-plt.style.use('ggplot')
+#plt.style.use('ggplot')
 
 
 def get_logs(name, run):
@@ -69,10 +69,14 @@ if __name__ == "__main__":
         train_rmse[i * n: (i + 1) * n, 1] = nbart_data['test_rmse'][:, i]
     train_rmse = pd.DataFrame(train_rmse, columns=['Training epoch', 'RMSE'])
 
+    fig = plt.figure(figsize=(5, 4))
     sns.lineplot(data=train_rmse, x='Training epoch', y='RMSE', color='green', label='NBART')
-    plt.hlines(train_mean, 0, 100, colors='red', label='BART Baseline')
+    plt.hlines(train_mean, -1, 100, colors='red', label='BART Baseline')
+    plt.xlim(xmin=0, xmax=99)
+    plt.ylim(ymin=0)
     plt.title("Evolution of training RMSE on {}".format(args.name))
     plt.legend()
+    plt.tight_layout()
     plt.savefig('plots/{}_train.png'.format(args.name))
     plt.clf()
 
@@ -86,10 +90,14 @@ if __name__ == "__main__":
         val_rmse[i * n: (i + 1) * n, 1] = nbart_data['test_rmse'][:, i]
     val_rmse = pd.DataFrame(train_rmse, columns=['Training epoch', 'RMSE'])
 
+    fig = plt.figure(figsize=(5, 4))
     sns.lineplot(data=val_rmse, x='Training epoch', y='RMSE', color='blue', label='NBART')
-    plt.hlines(train_mean, 0, 100, colors='red', label='BART Baseline')
+    plt.hlines(train_mean, -1, 100, colors='red', label='BART Baseline')
+    plt.xlim(xmin=0, xmax=99)
+    plt.ylim(ymin=0)
     plt.title("Evolution of validation RMSE on {}".format(args.name))
     plt.legend()
+    plt.tight_layout()
     plt.savefig('plots/{}_val.png'.format(args.name))
     plt.clf()
 
